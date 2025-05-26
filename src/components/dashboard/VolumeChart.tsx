@@ -1,14 +1,14 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { DailyVolume, WeeklyVolume, MonthlyVolume, TimeFrame } from '../../types';
+import { DailyVolume, WeeklyVolume, MonthlyVolume, TimeFrame, AggregatedVolume } from '../../types';
 import Card from '../ui/Card';
 import Tabs from '../ui/Tabs';
 import { formatUSD } from '../../utils/formatters';
 
 interface VolumeChartProps {
   dailyData: DailyVolume[];
-  weeklyData: WeeklyVolume[];
-  monthlyData: MonthlyVolume[];
+  weeklyData: AggregatedVolume[];
+  monthlyData: AggregatedVolume[];
   timeframe: TimeFrame;
   onTimeframeChange: (timeframe: TimeFrame) => void;
 }

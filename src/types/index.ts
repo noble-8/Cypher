@@ -16,6 +16,7 @@ export interface DailyVolume {
 }
 
 export interface WeeklyVolume {
+  date: string;
   week: string;
   startDate: string;
   endDate: string;
@@ -23,6 +24,7 @@ export interface WeeklyVolume {
 }
 
 export interface MonthlyVolume {
+  date: string;
   month: string;
   year: number;
   volume: number;
@@ -60,4 +62,9 @@ export interface TokenTransfer {
   tokenAddress: string;
   value: bigint;
   timestamp: number;
+}
+
+export interface AggregatedVolume {
+  date: string; // YYYY-MM-DD or YYYY-WW or YYYY-MM
+  volume: number;
 }

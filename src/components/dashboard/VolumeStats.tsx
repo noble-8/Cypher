@@ -1,13 +1,13 @@
 import React from 'react';
 import { ArrowUpRight, ArrowDownRight, DollarSign, TrendingUp } from 'lucide-react';
 import Card from '../ui/Card';
-import { DailyVolume, WeeklyVolume, MonthlyVolume } from '../../types';
+import { DailyVolume, WeeklyVolume, MonthlyVolume, AggregatedVolume } from '../../types';
 import { formatUSD } from '../../utils/formatters';
 
 interface VolumeStatsProps {
   dailyData: DailyVolume[];
-  weeklyData: WeeklyVolume[];
-  monthlyData: MonthlyVolume[];
+  weeklyData: AggregatedVolume[];
+  monthlyData: AggregatedVolume[];
 }
 
 const VolumeStats: React.FC<VolumeStatsProps> = ({

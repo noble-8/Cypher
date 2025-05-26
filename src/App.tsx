@@ -5,15 +5,12 @@ import VolumeStats from './components/dashboard/VolumeStats';
 import CounterpartyTable from './components/wallet/CounterpartyTable';
 import LoadingState from './components/dashboard/LoadingState';
 import Card from './components/ui/Card';
-import { TimeFrame, WalletAnalysis } from './types';
+import { TimeFrame, WalletAnalysis, AggregatedVolume } from './types';
 import { 
   getUSDLoadVolume, 
   analyzeWallet 
 } from './services/blockchainService';
 import { 
-  MOCK_DAILY_VOLUME, 
-  MOCK_WEEKLY_VOLUME, 
-  MOCK_MONTHLY_VOLUME,
   CYPHER_MASTER_WALLET
 } from './constants';
 import { formatAddress } from './utils/formatters';
@@ -21,10 +18,12 @@ import { Wallet } from 'lucide-react';
 
 function App() {
   // State for volume data
-  const [dailyVolume, setDailyVolume] = useState(MOCK_DAILY_VOLUME);
-  const [weeklyVolume, setWeeklyVolume] = useState(MOCK_WEEKLY_VOLUME);
-  const [monthlyVolume, setMonthlyVolume] = useState(MOCK_MONTHLY_VOLUME);
+  const [dailyVolume, setDailyVolume] = useState<AggregatedVolume[]>([]);
+  const [weeklyVolume, setWeeklyVolume] = useState<AggregatedVolume[]>([]);
+  const [monthlyVolume, setMonthlyVolume] = useState<AggregatedVolume[]>([]);
   const [timeframe, setTimeframe] = useState<TimeFrame>('daily');
+  const startDate = '2025-01-01';
+  const endDate = '2025-12-31';
   
   // State for wallet analysis
   const [walletAnalysis, setWalletAnalysis] = useState<WalletAnalysis | null>(null);
@@ -40,7 +39,7 @@ function App() {
   useEffect(() => {
     loadVolumeData();
   }, []);
-  
+
   // Load all volume data
   const loadVolumeData = async () => {
     setIsLoadingVolume(true);
@@ -49,14 +48,14 @@ function App() {
     try {
       // Load all timeframes in parallel
       const [dailyData, weeklyData, monthlyData] = await Promise.all([
-        getUSDLoadVolume('daily'),
-        getUSDLoadVolume('weekly'),
-        getUSDLoadVolume('monthly')
+        getUSDLoadVolume('daily', startDate, endDate),
+        getUSDLoadVolume('weekly', startDate, endDate),
+        getUSDLoadVolume('monthly', startDate, endDate)
       ]);
       
-      setDailyVolume(dailyData as typeof MOCK_DAILY_VOLUME);
-      setWeeklyVolume(weeklyData as typeof MOCK_WEEKLY_VOLUME);
-      setMonthlyVolume(monthlyData as typeof MOCK_MONTHLY_VOLUME);
+      setDailyVolume(dailyData);
+      setWeeklyVolume(weeklyData);
+      setMonthlyVolume(monthlyData);
     } catch (err) {
       console.error('Error loading volume data:', err);
       setError('Failed to load volume data. Please try again later.');
@@ -70,16 +69,21 @@ function App() {
     setIsAnalyzing(true);
     setError(null);
     
-    try {
-      const analysis = await analyzeWallet(address);
-      setWalletAnalysis(analysis);
-    } catch (err) {
-      console.error('Error analyzing wallet:', err);
-      setError('Failed to analyze wallet. Please try again later.');
-      setWalletAnalysis(null);
-    } finally {
-      setIsAnalyzing(false);
-    }
+try {
+  const analysis = await analyzeWallet(address);
+  if (analysis && typeof analysis === 'object' && analysis.address) {
+    setWalletAnalysis(analysis);
+  } else {
+    setError('Invalid analysis result.');
+    setWalletAnalysis(null);
+  }
+} catch (err) {
+  console.error('Error analyzing wallet:', err);
+  setError('Failed to analyze wallet. Please try again later.');
+  setWalletAnalysis(null);
+} finally {
+  setIsAnalyzing(false);
+}
   };
   
   // Handle timeframe change for the volume chart
